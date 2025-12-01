@@ -6,24 +6,36 @@ import pandas as pd
 from utils.config import load_config
 from utils.data import convert_df
 from utils.logger import LOGGER
+from utils.secrets import get_secret
 from utils.sheets import retrieve_sheet
+
+RANGES: list = ["Form Version 2016", "Form Version 2005"]
 
 # TODO: figure out how to abort if sheet has not been updated since last run
 def main():
-    # todo: handle multiple sheet tab ranges to extract data from
-    config: dict = load_config('config.yaml') # revise: load secrets from secrets manager and toml?
-
-    # load reference data sets
-
-    # loop to retrieve both sheets needed for CDR
-    sheet_data: Optional[Tuple[list, list]] = retrieve_sheet(config)
-
-    if sheet_data is not None:
-        header, rows = sheet_data
-        df: pd.DataFrame = convert_df(header, rows)
+    config: dict = get_secret(['sheets', 's3', 'cdr'])
     
-    LOGGER.info(df.head())
+    # TODO: load reference data sets
 
+    data: pd.DataFrame = pd.DataFrame()
+
+    # TODO: make doc type param
+    doc_config: dict = config.get('cdr', {})
+
+    # retrieve data from both sheets needed for CDR
+    # TODO: store range info in config
+    for range_name in RANGES:
+        doc_config['range_name'] = range_name
+
+        sheet_data: Optional[Tuple[list, list]] = retrieve_sheet(config.get('sheets', {}), doc_config)
+
+        if sheet_data is not None:
+            header, rows = sheet_data
+            df: pd.DataFrame = convert_df(header, rows)
+        
+            data = pd.concat([data, df])
+
+    LOGGER.info(data.shape)
     # combine data from both ranges into one dataset
 
     # dataset-specific cleaning - output to clean dataset bucket

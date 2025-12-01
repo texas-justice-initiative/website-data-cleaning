@@ -1,19 +1,15 @@
-# Use this code snippet in your app.
-# If you need more information about configurations
-# or implementing the sample code, visit the AWS docs:
-# https://aws.amazon.com/developer/language/python/
+from collections import defaultdict
+import json
 
 import boto3
 from botocore.exceptions import ClientError
 
 
-def get_secret():
-
+def get_secret(scopes: list[str] = []) -> dict:
     secret_name = "data-processing"
     region_name = "us-east-2"
 
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
+    session = boto3.session.Session(profile_name='tji')
     client = session.client(
         service_name='secretsmanager',
         region_name=region_name
@@ -28,6 +24,14 @@ def get_secret():
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
-    secret = get_secret_value_response['SecretString']
+    secret = json.loads(get_secret_value_response['SecretString'])
 
-    # Your code goes here.
+    parsed = defaultdict(dict)
+
+    for key, value in secret.items():
+        scope, label = key.split('.')
+        if scope in scopes:
+            parsed[scope].update({label: value})
+    
+    return parsed
+
