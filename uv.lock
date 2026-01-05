@@ -451,6 +451,7 @@ dependencies = [
     { name = "google-api-python-client" },
     { name = "google-auth-httplib2" },
     { name = "google-auth-oauthlib" },
+    { name = "numpy" },
     { name = "pandas" },
 ]
 
@@ -461,5 +462,6 @@ requires-dist = [
     { name = "google-api-python-client", specifier = ">=2.187.0" },
     { name = "google-auth-httplib2", specifier = ">=0.2.1" },
     { name = "google-auth-oauthlib", specifier = ">=1.2.3" },
+    { name = "numpy", specifier = ">=2.3.5" },
     { name = "pandas", specifier = ">=2.3.3" },
 ]

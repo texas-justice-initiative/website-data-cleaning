@@ -1,7 +1,7 @@
 [project]
 name = "website-data-cleaning"
 version = "0.1.0"
-description = "Add your description here"
+description = "Port of legacy TJI data processing"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -10,5 +10,6 @@ dependencies = [
     "google-api-python-client>=2.187.0",
     "google-auth-httplib2>=0.2.1",
     "google-auth-oauthlib>=1.2.3",
+    "numpy>=2.3.5",
     "pandas>=2.3.3",
 ]
