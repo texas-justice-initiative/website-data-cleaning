@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import service_account
 
-from utils.logger import LOGGER
+from shared.logger import LOGGER
 
 
 def get_creds(

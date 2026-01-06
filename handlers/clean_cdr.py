@@ -4,9 +4,8 @@ from typing import Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from utils.agency import standardize_agency_name
-from utils.cdr.columns import rename_columns, sort_columns
-from utils.data import (
+from shared.agency import standardize_agency_name
+from shared.data import (
     clean_floats,
     convert_date_cols,
     convert_df,
@@ -18,10 +17,11 @@ from utils.data import (
     standardize_race_cols,
     upcase_strip_string_cells,
 )
-from utils.logger import LOGGER
-from utils.s3 import get_s3_data, save_s3
-from utils.secrets import get_secret
-from utils.sheets import retrieve_sheet
+from shared.logger import LOGGER
+from shared.s3 import get_s3_data, save_s3
+from shared.secrets import get_secret
+from shared.sheets import retrieve_sheet
+from cdr.columns import rename_columns, sort_columns
 
 RANGES: list = ["2016", "2005"]
 
@@ -58,7 +58,7 @@ def main():
             header, rows = sheet_data
             df: pd.DataFrame = convert_df(header, rows)
             df["form_version"] = f"V_{range_name}"
-            df.to_csv(f"{range_name}_cdr.csv", index=False)
+            # TODO: add optional env var to publish intermediate dataset to S3
 
             cdr = pd.concat([cdr, df])
 
@@ -584,16 +584,10 @@ def main():
     ### write to s3 - cleaned dataset bucket
 
     ### TODO: data still has a lot of wonky dates; maybe missed some cleaning?
-    save_s3(cdr, "tji-private-cleaned-datasets", "cleaned_custodial_death_reports.csv")
+    ### TODO: centralize bucket name constants to sync between cleaning and publishing
+    save_s3(cdr, "tji-public-cleaned-datasets", "cleaned_custodial_death_reports.csv")
 
     ### TODO: make record of issues still noted in notebook
-    # prepare/publish data for website - output to compressed dataset bucket
-
-    ## integrate dataset-specific config from: create_datasets_for_website.ipynb
-    ## convert to js/drop columns
-    ## bucket age ranges
-    ## slider data?
-    ## write to compressed s3 bucket
 
 
 if __name__ == "__main__":

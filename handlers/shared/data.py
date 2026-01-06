@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from utils.logger import LOGGER
+from shared.logger import LOGGER
 
 
 class CleaningError(Exception):
